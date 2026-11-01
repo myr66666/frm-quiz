@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FRM / CFA 刷题助手</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --card:#ffffff; --ink:#1f2733; --sub:#6b7686;
+    --brand:#3b6ef6; --brand-soft:#e8effe; --ok:#16a34a; --ok-soft:#e6f7ec;
+    --bad:#dc2626; --bad-soft:#fdeaea; --line:#e5e9f2; --amber:#d97706;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:"Segoe UI","Microsoft YaHei",system-ui,sans-serif;background:var(--bg);color:var(--ink);line-height:1.7}
+  header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+  .hwrap{max-width:980px;margin:0 auto;padding:12px 20px;display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  .logo{font-weight:800;font-size:18px;color:var(--brand);cursor:pointer;white-space:nowrap}
+  .crumb{color:var(--sub);font-size:14px}
+  main{max-width:980px;margin:0 auto;padding:24px 20px 80px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:18px;margin-top:18px}
+  .exam-card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;cursor:pointer;transition:.18s;box-shadow:0 1px 3px rgba(20,40,80,.05)}
+  .exam-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(30,60,140,.12);border-color:var(--brand)}
+  .exam-card h3{font-size:17px;margin-bottom:8px}
+  .exam-card .meta{font-size:13px;color:var(--sub)}
+  .pbar{height:8px;background:var(--line);border-radius:99px;margin:12px 0 6px;overflow:hidden}
+  .pbar>i{display:block;height:100%;background:linear-gradient(90deg,#3b6ef6,#7aa5ff);border-radius:99px;transition:.3s}
+  .stat-line{font-size:13px;color:var(--sub);display:flex;justify-content:space-between}
+  .btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);
+       padding:8px 16px;border-radius:10px;font-size:14px;cursor:pointer;transition:.15s;user-select:none}
+  .btn:hover{border-color:var(--brand);color:var(--brand)}
+  .btn.primary{background:var(--brand);border-color:var(--brand);color:#fff}
+  .btn.primary:hover{background:#2f5de0}
+  .btn.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+  .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+  .qcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 28px;box-shadow:0 1px 3px rgba(20,40,80,.05)}
+  .qhead{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .qid{font-size:13px;color:var(--sub)}
+  .qid b{color:var(--brand);font-size:15px}
+  .stem{font-size:15.5px;white-space:pre-wrap;word-break:break-word}
+  .stem-zh{margin-top:10px;padding:10px 14px;background:#f7f9ff;border-left:3px solid var(--brand);border-radius:0 8px 8px 0;
+           font-size:14.5px;color:#33415c;white-space:pre-wrap;word-break:break-word}
+  table.md{border-collapse:collapse;margin:10px 0;font-size:14px}
+  table.md th,table.md td{border:1px solid var(--line);padding:5px 12px;text-align:left}
+  table.md th{background:#f2f5fc}
+  .opts{margin-top:18px;display:flex;flex-direction:column;gap:10px}
+  .opt{display:flex;gap:12px;padding:12px 16px;border:1.5px solid var(--line);border-radius:12px;cursor:pointer;transition:.15s;font-size:14.5px}
+  .opt:hover{border-color:var(--brand);background:var(--brand-soft)}
+  .opt .k{font-weight:700;color:var(--sub);min-width:20px}
+  .opt.sel{border-color:var(--brand);background:var(--brand-soft)}
+  .opt.right{border-color:var(--ok);background:var(--ok-soft)}
+  .opt.right .k{color:var(--ok)}
+  .opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+  .opt.wrong .k{color:var(--bad)}
+  .opt .zh{display:block;color:#55617a;font-size:13.5px;margin-top:2px}
+  .expl{margin-top:20px;border-radius:12px;padding:16px 18px;font-size:14.5px;display:none}
+  .expl.show{display:block}
+  .expl.ok{background:var(--ok-soft);border:1px solid #bbe5c8}
+  .expl.no{background:var(--bad-soft);border:1px solid #f3c5c5}
+  .expl .tag{display:inline-block;font-weight:700;font-size:13px;padding:2px 10px;border-radius:99px;margin-bottom:8px}
+  .expl.ok .tag{background:var(--ok);color:#fff}
+  .expl.no .tag{background:var(--bad);color:#fff}
+  .expl .ans-line{font-weight:600;margin-bottom:8px}
+  .expl .zh-block{margin-top:10px;padding-top:10px;border-top:1px dashed rgba(0,0,0,.12);color:#33415c;white-space:pre-wrap}
+  .expl .en-block{white-space:pre-wrap;word-break:break-word}
+  .nav{display:flex;justify-content:space-between;align-items:center;margin-top:22px;gap:10px;flex-wrap:wrap}
+  .grid-btn{font-size:13px}
+  .qgrid{display:none;position:fixed;inset:0;z-index:50;background:rgba(15,23,42,.45);justify-content:center;align-items:flex-start;padding:60px 16px}
+  .qgrid.show{display:flex}
+  .qgrid .panel{background:#fff;border-radius:16px;max-width:720px;width:100%;max-height:75vh;overflow:auto;padding:22px}
+  .qgrid .cells{display:grid;grid-template-columns:repeat(auto-fill,minmax(46px,1fr));gap:8px;margin-top:14px}
+  .cell{height:40px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;background:#fff}
+  .cell:hover{border-color:var(--brand);color:var(--brand)}
+  .cell.done{background:var(--brand-soft);border-color:#bcd0fb;color:var(--brand)}
+  .cell.wrong{background:var(--bad-soft);border-color:#f0b4b4;color:var(--bad)}
+  .cell.cur{outline:2px solid var(--brand);font-weight:700}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--sub);margin-top:12px;flex-wrap:wrap}
+  .dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:middle}
+  .empty{text-align:center;color:var(--sub);padding:60px 0}
+  .home-hero{margin-top:10px}
+  .home-hero h1{font-size:26px}
+  .home-hero p{color:var(--sub);margin-top:6px;font-size:14px}
+  .overall{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px;display:flex;gap:30px;flex-wrap:wrap;font-size:14px}
+  .overall b{color:var(--brand);font-size:20px;display:block}
+  @media(max-width:600px){.qcard{padding:18px}}
+</style>
+</head>
+<body>
+<header>
+  <div class="hwrap">
+    <span class="logo" onclick="goHome()">📚 刷题助手</span>
+    <span class="crumb" id="crumb"></span>
+    <span style="flex:1"></span>
+    <button class="btn" id="zhToggle" onclick="toggleZh()">中文学员模式：开</button>
+  </div>
+</header>
+<main id="app"></main>
+
+<div class="qgrid" id="qgrid" onclick="if(event.target===this)closeGrid()">
+  <div class="panel">
+    <div style="display:flex;justify-content:space-between;align-items:center">
+      <b>题目导航</b>
+      <button class="btn" onclick="closeGrid()">关闭</button>
+    </div>
+    <div class="legend">
+      <span><i class="dot" style="background:#e8effe;border:1px solid #bcd0fb"></i>已做</span>
+      <span><i class="dot" style="background:#fdeaea;border:1px solid #f0b4b4"></i>错题</span>
+      <span><i class="dot" style="background:#fff;border:1px solid #e5e9f2"></i>未做</span>
+    </div>
+    <div class="cells" id="cells"></div>
+  </div>
+</div>
+
+<script src="data.js"></script>
+<script>
+/* ---------------- state ---------------- */
+const LS = 'quiz_progress_v1';
+let store = JSON.parse(localStorage.getItem(LS) || '{}');   // {examKey:{ans:{id:letter}}}
+let showZh = localStorage.getItem('quiz_zh') !== '0';
+let cur = { exam:null, list:[], idx:0, mode:'all' };        // mode: all|random|wrong|undone
+
+const save = () => localStorage.setItem(LS, JSON.stringify(store));
+const $ = s => document.querySelector(s);
+
+function examStore(key){
+  if(!store[key]) store[key] = {ans:{}};
+  return store[key];
+}
+
+/* ---------------- helpers ---------------- */
+function esc(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+/* render text that may contain a markdown table */
+function renderMd(src){
+  if(!src) return '';
+  const lines = esc(src).split('\n');
+  let html = '', inTable = false, rows = [];
+  const flush = () => {
+    if(!rows.length) return;
+    html += '<table class="md">';
+    rows.forEach((r,i)=>{
+      const cells = r.split('|').map(c=>c.trim()).filter((c,ci,arr)=>!(ci===0&&c==='')&&!(ci===arr.length-1&&c===''));
+      if(/^[:\-|\s]+$/.test(r)) return; // separator
+      const tag = i===0 ? 'th':'td';
+      html += '<tr>'+cells.map(c=>`<${tag}>${c}</${tag}>`).join('')+'</tr>';
+    });
+    html += '</table>'; rows = [];
+  };
+  for(const ln of lines){
+    if(ln.trim().startsWith('|')){ rows.push(ln.trim()); inTable = true; }
+    else { if(inTable){ flush(); inTable=false; } html += ln + '\n'; }
+  }
+  flush();
+  return html.replace(/\n/g,'<br>');
+}
+
+function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[r[i],r[j]]=[r[j],r[i]];}return r;}
+
+/* ---------------- views ---------------- */
+function goHome(){
+  cur = {exam:null,list:[],idx:0,mode:'all'};
+  $('#crumb').textContent = '';
+  const keys = Object.keys(EXAMS);
+  let totQ=0, totDone=0, totWrong=0;
+  const cards = keys.map(k=>{
+    const ex = EXAMS[k], st = examStore(k);
+    const n = ex.questions.length;
+    const ids = new Set(ex.questions.map(q=>q.id));
+    const doneIds = Object.keys(st.ans).filter(id=>ids.has(+id));
+    const wrong = doneIds.filter(id=>{
+      const q = ex.questions.find(x=>x.id===+id);
+      return q && st.ans[id] !== q.answer;
+    });
+    totQ+=n; totDone+=doneIds.length; totWrong+=wrong.length;
+    const pct = n? Math.round(doneIds.length/n*100):0;
+    return `<div class="exam-card" onclick="openExam('${k}')">
+      <h3>${ex.title}</h3>
+      <div class="meta">${n} 题 · 双语题干 · 答案解析</div>
+      <div class="pbar"><i style="width:${pct}%"></i></div>
+      <div class="stat-line"><span>已完成 ${doneIds.length}/${n}</span><span>错题 ${wrong.length}</span></div>
+    </div>`;
+  }).join('');
+  const acc = totDone? Math.round((totDone-totWrong)/totDone*100):0;
+  $('#app').innerHTML = `
+    <div class="home-hero">
+      <h1>选择一套题开始刷题</h1>
+      <p>做题记录自动保存在本地浏览器，随时回来接着刷。点卡片进入后可切换顺序 / 随机 / 错题模式。</p>
+    </div>
+    <div class="overall">
+      <div><b>${totQ}</b>总题数</div>
+      <div><b>${totDone}</b>已做</div>
+      <div><b>${totWrong}</b>错题</div>
+      <div><b>${acc}%</b>正确率</div>
+      <div style="margin-left:auto"><button class="btn" onclick="resetAll()">清空全部记录</button></div>
+    </div>
+    <div class="cards">${cards}</div>`;
+}
+
+function resetAll(){
+  if(confirm('确定清空所有做题记录？此操作不可恢复。')){
+    store = {}; save(); goHome();
+  }
+}
+
+function openExam(key, mode){
+  const ex = EXAMS[key];
+  cur.exam = key;
+  cur.mode = mode || 'all';
+  buildList();
+  cur.idx = 0;
+  renderQ();
+}
+
+function buildList(){
+  const ex = EXAMS[cur.exam], st = examStore(cur.exam);
+  let list = [...ex.questions];
+  if(cur.mode==='wrong'){
+    list = list.filter(q=>st.ans[q.id] && st.ans[q.id]!==q.answer);
+  } else if(cur.mode==='undone'){
+    list = list.filter(q=>!st.ans[q.id]);
+  }
+  if(cur.mode==='random') list = shuffle(list);
+  cur.list = list;
+}
+
+function renderQ(){
+  const ex = EXAMS[cur.exam], st = examStore(cur.exam);
+  $('#crumb').textContent = ' / ' + ex.short;
+  if(!cur.list.length){
+    $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">🎉</p><p>这个筛选条件下没有题目了</p>
+      <br><button class="btn primary" onclick="openExam('${cur.exam}','all')">返回全部题目</button>
+      <button class="btn" onclick="goHome()">回首页</button></div>`;
+    return;
+  }
+  const q = cur.list[cur.idx];
+  const chosen = st.ans[q.id];
+  const total = cur.list.length;
+
+  const opts = q.options.map(o=>{
+    let cls = 'opt';
+    if(chosen){
+      if(o.key===q.answer) cls += ' right';
+      else if(o.key===chosen) cls += ' wrong';
+    }
+    return `<div class="${cls}" onclick="pick('${o.key}')">
+      <span class="k">${o.key}.</span>
+      <span><span class="en">${esc(o.en)}</span>
+      ${showZh?`<span class="zh">${esc(o.zh)}</span>`:''}</span>
+    </div>`;
+  }).join('');
+
+  let explHtml = '';
+  if(chosen){
+    const good = chosen===q.answer;
+    explHtml = `<div class="expl show ${good?'ok':'no'}">
+      <span class="tag">${good?'✓ 回答正确':'✗ 回答错误'}</span>
+      <div class="ans-line">正确答案：${q.answer}</div>
+      ${q.expl_en?`<div class="en-block">${renderMd(q.expl_en)}</div>`:'<div class="en-block" style="color:#888">（本题暂无文字解析）</div>'}
+      ${showZh&&q.expl_zh?`<div class="zh-block">${renderMd(q.expl_zh)}</div>`:''}
+    </div>`;
+  }
+
+  $('#app').innerHTML = `
+    <div class="toolbar">
+      <button class="btn ${cur.mode==='all'?'on':''}" onclick="openExam('${cur.exam}','all')">顺序</button>
+      <button class="btn ${cur.mode==='random'?'on':''}" onclick="openExam('${cur.exam}','random')">随机</button>
+      <button class="btn ${cur.mode==='undone'?'on':''}" onclick="openExam('${cur.exam}','undone')">未做</button>
+      <button class="btn ${cur.mode==='wrong'?'on':''}" onclick="openExam('${cur.exam}','wrong')">错题本</button>
+      <span style="flex:1"></span>
+      <button class="btn grid-btn" onclick="openGrid()">题目导航</button>
+      <button class="btn" onclick="goHome()">回首页</button>
+    </div>
+    <div class="qcard">
+      <div class="qhead">
+        <span class="qid"><b>第 ${q.id} 题</b> &nbsp;${cur.idx+1} / ${total}${cur.mode!=='all'?'（'+modeName(cur.mode)+'）':''}</span>
+        ${chosen?`<span class="qid">你的选择：${chosen}</span>`:''}
+      </div>
+      <div class="stem">${renderMd(q.stem_en)}</div>
+      ${showZh?`<div class="stem-zh">${renderMd(q.stem_zh)}</div>`:''}
+      <div class="opts">${opts}</div>
+      ${explHtml}
+      <div class="nav">
+        <button class="btn" ${cur.idx===0?'disabled style="opacity:.4"':''} onclick="jump(${cur.idx-1})">← 上一题</button>
+        <span style="display:flex;gap:8px">
+          ${chosen&&chosen!==q.answer?'<button class="btn" onclick="markKnow()">这题我会了</button>':''}
+        </span>
+        <button class="btn primary" ${cur.idx>=total-1?'disabled style="opacity:.4"':''} onclick="jump(${cur.idx+1})">下一题 →</button>
+      </div>
+    </div>`;
+  window.scrollTo({top:0});
+}
+
+function modeName(m){return {all:'顺序',random:'随机',undone:'未做',wrong:'错题本'}[m]||m;}
+
+function pick(key){
+  const st = examStore(cur.exam);
+  const q = cur.list[cur.idx];
+  if(st.ans[q.id]) return;         // already answered
+  st.ans[q.id] = key; save();
+  renderQ();
+}
+
+function markKnow(){
+  // remove a wrong answer from record so it leaves the wrong-book
+  const st = examStore(cur.exam);
+  const q = cur.list[cur.idx];
+  delete st.ans[q.id]; save();
+  if(cur.mode==='wrong'){ buildList(); if(cur.idx>=cur.list.length) cur.idx=cur.list.length-1; }
+  renderQ();
+}
+
+function jump(i){ if(i<0||i>=cur.list.length) return; cur.idx=i; renderQ(); }
+
+function openGrid(){
+  const st = examStore(cur.exam);
+  $('#cells').innerHTML = cur.list.map((q,i)=>{
+    const a = st.ans[q.id];
+    let cls = 'cell';
+    if(a) cls += a===q.answer ? ' done' : ' wrong';
+    if(i===cur.idx) cls += ' cur';
+    return `<div class="${cls}" onclick="jump(${i});closeGrid()">${q.id}</div>`;
+  }).join('');
+  $('#qgrid').classList.add('show');
+}
+function closeGrid(){ $('#qgrid').classList.remove('show'); }
+
+function toggleZh(){
+  showZh = !showZh;
+  localStorage.setItem('quiz_zh', showZh?'1':'0');
+  $('#zhToggle').textContent = '中文学员模式：' + (showZh?'开':'关');
+  if(cur.exam) renderQ();
+}
+
+document.addEventListener('keydown', e=>{
+  if(!cur.exam) return;
+  const q = cur.list[cur.idx];
+  if(!q) return;
+  const map = {a:'A',b:'B',c:'C',d:'D','1':'A','2':'B','3':'C','4':'D'};
+  const k = e.key.toLowerCase();
+  if(map[k] && q.options.some(o=>o.key===map[k])) pick(map[k]);
+  else if(e.key==='ArrowRight') jump(cur.idx+1);
+  else if(e.key==='ArrowLeft') jump(cur.idx-1);
+});
+
+$('#zhToggle').textContent = '中文学员模式：' + (showZh?'开':'关');
+goHome();
+</script>
+</body>
+</html>
