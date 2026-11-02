@@ -2,7 +2,15 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="刷题助手">
+<meta name="theme-color" content="#3b6ef6">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>FRM / CFA 刷题助手</title>
 <style>
   :root{
@@ -82,6 +90,15 @@
   .overall{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px;display:flex;gap:30px;flex-wrap:wrap;font-size:14px}
   .overall b{color:var(--brand);font-size:20px;display:block}
   @media(max-width:600px){.qcard{padding:18px}}
+  /* iOS / PWA 适配 */
+  html{-webkit-text-size-adjust:100%}
+  body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
+  header{padding-top:env(safe-area-inset-top)}
+  .hwrap{padding-left:calc(20px + env(safe-area-inset-left));padding-right:calc(20px + env(safe-area-inset-right))}
+  main{padding-bottom:calc(80px + env(safe-area-inset-bottom))}
+  .opt,.btn,.cell,.exam-card{touch-action:manipulation}
+  .qgrid{padding:60px 16px calc(60px + env(safe-area-inset-bottom))}
+  .qgrid .panel{-webkit-overflow-scrolling:touch}
 </style>
 </head>
 <body>
@@ -343,6 +360,10 @@ document.addEventListener('keydown', e=>{
 
 $('#zhToggle').textContent = '中文学员模式：' + (showZh?'开':'关');
 goHome();
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('sw.js').catch(()=>{});
+}
 </script>
 </body>
 </html>
