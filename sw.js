@@ -1,8 +1,9 @@
-const CACHE = 'quiz-v1';
+const CACHE = 'quiz-v2';
 const ASSETS = [
   './',
   './index.html',
   './data.js',
+  './vocab.js',
   './manifest.webmanifest',
   './icon-180.png',
   './icon-192.png',
