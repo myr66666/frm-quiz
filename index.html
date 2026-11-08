@@ -90,6 +90,53 @@
   .overall{margin-top:20px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 22px;display:flex;gap:30px;flex-wrap:wrap;font-size:14px}
   .overall b{color:var(--brand);font-size:20px;display:block}
   @media(max-width:600px){.qcard{padding:18px}}
+  /* ---- 背单词模块 ---- */
+  .vocab-hero{margin-top:18px;background:linear-gradient(135deg,#3b6ef6,#7c4ff3);border-radius:16px;padding:22px 24px;color:#fff;cursor:pointer;transition:.18s;box-shadow:0 6px 20px rgba(50,70,200,.25)}
+  .vocab-hero:hover{transform:translateY(-3px);box-shadow:0 10px 28px rgba(50,70,200,.35)}
+  .vocab-hero h3{font-size:18px}
+  .vocab-hero .meta{font-size:13px;opacity:.85}
+  .vocab-hero .pbar{background:rgba(255,255,255,.25)}
+  .vocab-hero .pbar>i{background:#fff}
+  .vocab-hero .stat-line{color:rgba(255,255,255,.85)}
+  .vstats{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:16px}
+  .vstat{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px;text-align:center}
+  .vstat b{display:block;font-size:22px;color:var(--brand)}
+  .vstat span{font-size:12.5px;color:var(--sub)}
+  .vfilters{display:flex;gap:6px;flex-wrap:wrap;margin:14px 0}
+  .vf{padding:6px 13px;border-radius:99px;border:1px solid var(--line);background:var(--card);font-size:13px;cursor:pointer;user-select:none}
+  .vf:hover{border-color:var(--brand);color:var(--brand)}
+  .vf.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+  .vmodes{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:16px}
+  .vmode{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:20px;cursor:pointer;transition:.16s}
+  .vmode:hover{border-color:var(--brand);transform:translateY(-2px);box-shadow:0 6px 18px rgba(30,60,140,.12)}
+  .vmode .ic{font-size:26px}
+  .vmode h4{margin:6px 0 4px;font-size:15.5px}
+  .vmode p{font-size:13px;color:var(--sub)}
+  .vcard{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:34px 24px;min-height:230px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;cursor:pointer;box-shadow:0 1px 3px rgba(20,40,80,.05);transition:.15s}
+  .vcard:hover{border-color:var(--brand)}
+  .vcard .vlabel{font-size:12px;color:var(--sub);letter-spacing:2px;margin-bottom:10px}
+  .vword{font-size:27px;font-weight:800;word-break:break-word;line-height:1.4}
+  .vword-zh{font-size:24px;font-weight:700;color:var(--brand);margin-top:14px}
+  .vfull{margin-top:10px;font-size:14px;color:var(--sub)}
+  .vgrade{display:flex;gap:10px;margin-top:16px}
+  .vgrade .btn{flex:1;justify-content:center;padding:12px 8px;font-size:14.5px}
+  .g-ok{background:var(--ok-soft);border-color:#bbe5c8;color:var(--ok)!important;font-weight:700}
+  .g-mid{background:#fef3e2;border-color:#f5d9ae;color:var(--amber)!important;font-weight:700}
+  .g-no{background:var(--bad-soft);border-color:#f3c5c5;color:var(--bad)!important;font-weight:700}
+  .vinput{width:100%;padding:13px 16px;border:1.5px solid var(--line);border-radius:12px;font-size:16px;font-family:inherit;margin-top:16px;background:#fff}
+  .vinput:focus{border-color:var(--brand);outline:none;box-shadow:0 0 0 3px rgba(59,110,246,.12)}
+  .vres{margin-top:16px;border-radius:12px;padding:14px 16px;font-size:14.5px;display:none}
+  .vres.show{display:block}
+  .vres.ok{background:var(--ok-soft);border:1px solid #bbe5c8}
+  .vres.no{background:var(--bad-soft);border:1px solid #f3c5c5}
+  .abbr-chip{display:inline-block;background:#fff3e8;color:#c2410c;border:1px solid #ffd9b8;font-size:12px;padding:1px 9px;border-radius:99px;font-weight:700;margin-left:8px;vertical-align:middle}
+  .vlist-row{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid var(--line);font-size:14.5px}
+  .vlist-row .e{font-weight:600;word-break:break-word}
+  .vlist-row .z{color:#55617a;text-align:right;flex-shrink:0;max-width:45%}
+  .sdot{display:inline-block;width:8px;height:8px;border-radius:99px;margin-right:7px;vertical-align:middle}
+  .vsearch{width:100%;padding:10px 16px;border:1px solid var(--line);border-radius:10px;font-size:14.5px;font-family:inherit;margin-bottom:12px;background:#fff}
+  .vsearch:focus{border-color:var(--brand);outline:none}
+  .vbar{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
   /* iOS / PWA 适配 */
   html{-webkit-text-size-adjust:100%}
   body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent}
@@ -128,6 +175,7 @@
 </div>
 
 <script src="data.js"></script>
+<script src="vocab.js"></script>
 <script>
 /* ---------------- state ---------------- */
 const LS = 'quiz_progress_v1';
@@ -174,6 +222,7 @@ function shuffle(a){const r=[...a];for(let i=r.length-1;i>0;i--){const j=Math.fl
 
 /* ---------------- views ---------------- */
 function goHome(){
+  if(typeof vClearKey==='function') vClearKey();
   cur = {exam:null,list:[],idx:0,mode:'all'};
   $('#crumb').textContent = '';
   const keys = Object.keys(EXAMS);
@@ -197,10 +246,18 @@ function goHome(){
     </div>`;
   }).join('');
   const acc = totDone? Math.round((totDone-totWrong)/totDone*100):0;
+  const vs = vStats();
+  const vpct = Math.round(vs.known/vs.total*100);
   $('#app').innerHTML = `
     <div class="home-hero">
       <h1>选择一套题开始刷题</h1>
       <p>做题记录自动保存在本地浏览器，随时回来接着刷。点卡片进入后可切换顺序 / 随机 / 错题模式。</p>
+    </div>
+    <div class="vocab-hero" onclick="openVocab()">
+      <h3>📖 金融词汇 · 背单词</h3>
+      <div class="meta">${vs.total} 词 · 翻卡背词 / 默写测验 / 缩写全拼 · 英汉对照</div>
+      <div class="pbar"><i style="width:${vpct}%"></i></div>
+      <div class="stat-line"><span>已掌握 ${vs.known}/${vs.total}</span><span>${vs.unseen} 词待学</span></div>
     </div>
     <div class="overall">
       <div><b>${totQ}</b>总题数</div>
@@ -357,6 +414,360 @@ document.addEventListener('keydown', e=>{
   else if(e.key==='ArrowRight') jump(cur.idx+1);
   else if(e.key==='ArrowLeft') jump(cur.idx-1);
 });
+
+/* ================= 背单词模块 ================= */
+const VLS = 'vocab_progress_v1';
+let vstore = JSON.parse(localStorage.getItem(VLS) || '{"s":{},"wrong":{},"ab":{}}');
+if(!vstore.s) vstore.s = {};
+if(!vstore.wrong) vstore.wrong = {};
+if(!vstore.ab) vstore.ab = {};
+const vsave = () => localStorage.setItem(VLS, JSON.stringify(vstore));
+const W = (typeof WORDS!=='undefined') ? WORDS.map(a=>({en:a[0], zh:a[1], abbr:a[2]||''})) : [];
+let vcur = {view:'home', filter:'all', letter:'A', search:''};
+
+function vStats(){
+  let known=0, fuzzy=0, unknown=0;
+  for(const k in vstore.s){
+    const v = vstore.s[k];
+    if(v===2) known++; else if(v===1) fuzzy++; else unknown++;
+  }
+  const total = W.length;
+  return {total, known, fuzzy, unknown, unseen: total-known-fuzzy-unknown,
+          wrongN: Object.keys(vstore.wrong).length,
+          abWeak: Object.values(vstore.ab).filter(v=>v===0).length};
+}
+
+function vPool(filter){
+  if(Array.isArray(filter)) return filter;
+  if(/^[A-Z]$/.test(filter)) return W.filter(w=>w.en[0].toUpperCase()===filter);
+  if(filter==='unseen') return W.filter(w=>vstore.s[w.en]===undefined);
+  if(filter==='weak') return W.filter(w=>{
+    const s = vstore.s[w.en];
+    return s===0 || s===1 || (vstore.wrong[w.en]||0)>0 || vstore.ab[w.en]===0;
+  });
+  return [...W];
+}
+function vFilterName(f){
+  if(f==='all') return '全部词汇';
+  if(f==='unseen') return '未学的词';
+  if(f==='weak') return '薄弱词汇';
+  return f + ' 开头';
+}
+
+/* ---- 单词本首页 ---- */
+function openVocab(){
+  vcur = {view:'home', filter:'all', letter:'A', search:''};
+  renderVocabHome();
+}
+function renderVocabHome(){
+  vClearKey();
+  $('#crumb').textContent = ' / 背单词';
+  const st = vStats();
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const chips = ['all','unseen','weak'].map(f=>
+    `<span class="vf ${vcur.filter===f?'on':''}" onclick="vSetFilter('${f}')">${vFilterName(f)}</span>`).join('')
+    + letters.map(L=>{
+      const n = W.filter(w=>w.en[0].toUpperCase()===L).length;
+      return n?`<span class="vf ${vcur.filter===L?'on':''}" onclick="vSetFilter('${L}')">${L}</span>`:'';
+    }).join('');
+  const pool = vPool(vcur.filter);
+  $('#app').innerHTML = `
+    <div class="home-hero"><h1>📖 金融词汇背单词</h1>
+      <p>看英文回忆中文意思；带缩写的词（如 IPO）加考英文全拼。进度自动保存。</p></div>
+    <div class="vstats">
+      <div class="vstat"><b>${st.total}</b><span>总词数</span></div>
+      <div class="vstat"><b style="color:var(--ok)">${st.known}</b><span>已掌握</span></div>
+      <div class="vstat"><b style="color:var(--amber)">${st.fuzzy}</b><span>模糊</span></div>
+      <div class="vstat"><b style="color:var(--bad)">${st.unknown}</b><span>不认识</span></div>
+      <div class="vstat"><b>${st.unseen}</b><span>待学</span></div>
+      <div class="vstat"><b style="color:var(--bad)">${st.wrongN}</b><span>默写易错</span></div>
+      <div class="vstat"><b style="color:#c2410c">${st.abWeak}</b><span>缩写待巩固</span></div>
+    </div>
+    <div style="margin-top:20px;font-weight:700;font-size:14.5px">选择范围（当前 ${pool.length} 词）</div>
+    <div class="vfilters">${chips}</div>
+    <div class="vmodes">
+      <div class="vmode" onclick="startFlash()">
+        <div class="ic">🃏</div><h4>翻卡背词</h4>
+        <p>看英文 → 点卡片翻面看中文 → 自评 认识 / 模糊 / 不认识</p>
+      </div>
+      <div class="vmode" onclick="startType()">
+        <div class="ic">✍️</div><h4>默写测验</h4>
+        <p>看英文打中文意思；缩写题看缩写打英文全拼（如 IPO → Initial Public Offering）</p>
+      </div>
+      <div class="vmode" onclick="openVlist()">
+        <div class="ic">📋</div><h4>词表浏览</h4>
+        <p>按字母分组浏览全部词汇，支持搜索，随时查</p>
+      </div>
+    </div>
+    <div class="toolbar">
+      <button class="btn" onclick="goHome()">← 回首页</button>
+      <span style="flex:1"></span>
+      <button class="btn" onclick="vReset()">重置背词记录</button>
+    </div>`;
+}
+function vSetFilter(f){ vcur.filter = f; renderVocabHome(); }
+function vReset(){
+  if(confirm('确定清空背单词进度（掌握状态、易错记录）？')){
+    vstore = {s:{},wrong:{},ab:{}}; vsave(); renderVocabHome();
+  }
+}
+
+/* ---- 翻卡模式 ---- */
+function startFlash(){
+  const pool = vPool(vcur.filter);
+  if(!pool.length){ vEmpty(); return; }
+  const pri = w=>{const s=vstore.s[w.en]; return s===undefined?1:(s===0?0:(s===1?2:3));};
+  const queue = shuffle(pool).sort((a,b)=>pri(a)-pri(b));
+  vcur = {...vcur, view:'flash', queue, idx:0, revealed:false};
+  renderFlash();
+}
+function renderFlash(){
+  vClearKey();
+  const q = vcur.queue[vcur.idx];
+  if(!q){
+    $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">🎉</p>
+      <p>这一轮翻完了！</p><br>
+      <button class="btn primary" onclick="startFlash()">再来一轮</button>
+      <button class="btn" onclick="openVocab()">返回单词本</button></div>`;
+    return;
+  }
+  const s = vstore.s[q.en];
+  const sTag = s===2?'<span class="abbr-chip" style="background:#e6f7ec;border-color:#bbe5c8;color:var(--ok)">已掌握</span>'
+    : s===1?'<span class="abbr-chip">模糊</span>'
+    : s===0?'<span class="abbr-chip" style="background:var(--bad-soft);border-color:#f3c5c5;color:var(--bad)">不认识</span>':'';
+  $('#app').innerHTML = `
+    <div class="vbar">
+      <button class="btn" onclick="openVocab()">← 退出</button>
+      <span class="qid"><b>${vcur.idx+1}</b> / ${vcur.queue.length} · ${vFilterName(vcur.filter)}</span>
+    </div>
+    <div class="vcard" onclick="vFlip()" id="vcard">
+      <div class="vlabel">英 文</div>
+      <div class="vword">${esc(q.en)}${q.abbr?`<span class="abbr-chip">${esc(q.abbr)}</span>`:''}${sTag}</div>
+      ${vcur.revealed?`
+        <div class="vword-zh">${esc(q.zh)}</div>
+        ${q.abbr?`<div class="vfull">全拼：${esc(q.en)}</div>`:''}
+      `:'<div class="vfull" style="margin-top:26px">👇 点击卡片查看中文释义</div>'}
+    </div>
+    <div class="vgrade">
+      <button class="btn g-no" ${vcur.revealed?'':'disabled style="opacity:.4"'} onclick="vGrade(0)">不认识</button>
+      <button class="btn g-mid" ${vcur.revealed?'':'disabled style="opacity:.4"'} onclick="vGrade(1)">模糊</button>
+      <button class="btn g-ok" ${vcur.revealed?'':'disabled style="opacity:.4"'} onclick="vGrade(2)">认识</button>
+    </div>`;
+}
+function vFlip(){ vcur.revealed = true; renderFlash(); }
+function vGrade(v){
+  const q = vcur.queue[vcur.idx];
+  if(!q) return;
+  vstore.s[q.en] = v; vsave();
+  vcur.idx++; vcur.revealed = false;
+  renderFlash();
+  window.scrollTo({top:0});
+}
+function vEmpty(){
+  $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">📭</p>
+    <p>当前筛选范围内没有单词，换一个范围试试</p><br>
+    <button class="btn primary" onclick="vSetFilterFromEmpty('all')">全部词汇</button></div>`;
+}
+function vSetFilterFromEmpty(f){ vcur.filter=f; renderVocabHome(); }
+
+/* ---- 默写模式 ---- */
+function startType(poolOverride){
+  const pool = poolOverride || vPool(vcur.filter);
+  if(!pool.length){ vEmpty(); return; }
+  let qs = [];
+  for(const w of pool){
+    qs.push({w, kind:'e2c'});
+    if(w.abbr) qs.push({w, kind:'abbr'});
+  }
+  vcur = {...vcur, view:'type', qlist:shuffle(qs), idx:0, answered:null,
+          correct:0, wrongWords:[]};
+  renderType();
+}
+function normZh(s){return (s||'').replace(/[\s、，,。．.;；·：:（）()\/\-]/g,'');}
+function normEn(s){return (s||'').toLowerCase().replace(/[^a-z0-9]/g,'');}
+function escAttr(s){return esc(s).replace(/"/g,'&quot;');}
+function vClearKey(){ document.onkeydown = null; }
+function zhMatch(input, expect){
+  const a = normZh(input), b = normZh(expect);
+  if(!a) return false;
+  if(a===b) return true;
+  const parts = expect.split(/[、，,]/).map(normZh).filter(Boolean);
+  return parts.some(p=>p===a);
+}
+function renderType(){
+  const q = vcur.qlist[vcur.idx];
+  if(!q){ renderTypeSummary(); return; }
+  const isAbbr = q.kind==='abbr';
+  const done = vcur.idx, tot = vcur.qlist.length;
+  const acc = done? Math.round(vcur.correct/done*100) : 100;
+  let resHtml = '';
+  if(vcur.answered){
+    const a = vcur.answered;
+    resHtml = `<div class="vres show ${a.ok?'ok':'no'}">
+      <div style="font-weight:700;margin-bottom:6px">${a.ok?'✓ 正确':'✗ 答案不符'}</div>
+      <div>你的答案：${esc(a.input)||'（空）'}</div>
+      <div>正确答案：<b>${isAbbr?esc(q.w.en):esc(q.w.zh)}</b>${isAbbr?`（${esc(q.w.zh)}）`:''}</div>
+      ${!a.ok?`<div style="margin-top:10px;display:flex;gap:8px">
+        <button class="btn g-ok" onclick="vSelf(1)">我其实答对了</button>
+        <button class="btn g-no" onclick="vSelf(0)">确实错了</button>
+      </div>`:''}
+    </div>`;
+  }
+  $('#app').innerHTML = `
+    <div class="vbar">
+      <button class="btn" onclick="openVocab()">← 退出</button>
+      <span class="qid"><b>${done+1}</b> / ${tot} · 正确率 ${acc}% · ${vFilterName(vcur.filter)}</span>
+    </div>
+    <div class="qcard">
+      <div class="qhead">
+        <span class="qid"><b>${isAbbr?'✍️ 写出缩写全拼':'🇨🇳 英译汉'}</b></span>
+      </div>
+      ${isAbbr?`
+        <div class="vword" style="font-size:34px">${esc(q.w.abbr)}</div>
+        <div class="vfull">提示（中文意思）：${esc(q.w.zh)}</div>
+        <input class="vinput" id="vinput" placeholder="Input the full English term…" ${vcur.answered?'disabled':''}
+          value="${vcur.answered?escAttr(vcur.answered.input):''}" autocapitalize="off" autocorrect="off">
+      `:`
+        <div class="vword">${esc(q.w.en)}</div>
+        <input class="vinput" id="vinput" placeholder="输入中文意思…" ${vcur.answered?'disabled':''}
+          value="${vcur.answered?escAttr(vcur.answered.input):''}">
+      `}
+      ${resHtml}
+      <div class="nav">
+        <span></span>
+        ${vcur.answered
+          ? `<button class="btn primary" onclick="vNext()">下一题 →</button>`
+          : `<button class="btn primary" onclick="vCheck()">提 交</button>`}
+      </div>
+    </div>`;
+  if(!vcur.answered){
+    const el = $('#vinput');
+    el.focus();
+    el.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); vCheck(); } };
+  } else {
+    document.onkeydown = e=>{ if(e.key==='Enter'){ e.preventDefault(); vNext(); } };
+  }
+}
+function vCheck(){
+  if(vcur.answered) return;
+  const q = vcur.qlist[vcur.idx];
+  const input = ($('#vinput').value||'').trim();
+  const ok = q.kind==='abbr' ? (normEn(input) && normEn(input)===normEn(q.w.en)) : zhMatch(input, q.w.zh);
+  vcur.answered = {ok, input};
+  if(ok){
+    vcur.correct++;
+    if(q.kind==='e2c') vstore.s[q.w.en] = 2;
+    else vstore.ab[q.w.en] = 1;
+  }
+  vsave();
+  renderType();
+}
+function vSelf(ok){
+  const q = vcur.qlist[vcur.idx];
+  if(!q || !vcur.answered || vcur.answered.ok) return;
+  if(ok){
+    vcur.correct++;
+    if(q.kind==='e2c') vstore.s[q.w.en] = 2;
+    else vstore.ab[q.w.en] = 1;
+  } else {
+    vMarkWrong(q);
+  }
+  vcur.answered = {ok, input:vcur.answered.input, self:true};
+  vsave();
+  renderType();
+}
+function vMarkWrong(q){
+  if(q.kind==='e2c') vstore.s[q.w.en] = 0;
+  else vstore.ab[q.w.en] = 0;
+  vstore.wrong[q.w.en] = (vstore.wrong[q.w.en]||0)+1;
+  if(!vcur.wrongWords.some(x=>x.en===q.w.en)) vcur.wrongWords.push(q.w);
+}
+function vNext(){
+  if(vcur.answered && !vcur.answered.ok && !vcur.answered.self){
+    vMarkWrong(vcur.qlist[vcur.idx]);
+    vsave();
+  }
+  vcur.idx++; vcur.answered = null;
+  renderType();
+  window.scrollTo({top:0});
+}
+function renderTypeSummary(){
+  vClearKey();
+  const tot = vcur.idx, acc = tot? Math.round(vcur.correct/tot*100):0;
+  const wrongs = vcur.wrongWords;
+  $('#app').innerHTML = `
+    <div class="empty"><p style="font-size:40px">🏁</p>
+      <p style="font-size:18px;font-weight:700">本轮测验完成</p>
+      <p>共 ${tot} 题 · 答对 ${vcur.correct} · 正确率 ${acc}%</p>
+      ${wrongs.length?`<div style="margin:18px auto;max-width:520px;text-align:left">
+        <div style="font-weight:700;margin-bottom:8px">本轮错词（${wrongs.length}）：</div>
+        ${wrongs.map(w=>`<div class="vlist-row"><span class="e">${esc(w.en)}${w.abbr?`<span class="abbr-chip">${esc(w.abbr)}</span>`:''}</span><span class="z">${esc(w.zh)}</span></div>`).join('')}
+      </div>`:''}
+      <br>
+      ${wrongs.length?`<button class="btn primary" onclick="startType(vcur.wrongWords)">只练本轮错词</button>`:''}
+      <button class="btn" onclick="startType()">再来一轮</button>
+      <button class="btn" onclick="openVocab()">返回单词本</button>
+    </div>`;
+}
+
+/* ---- 词表浏览 ---- */
+function openVlist(){
+  vcur.view = 'list';
+  renderVlist();
+}
+function vListRows(){
+  const s = vcur.search.trim().toLowerCase();
+  let rows;
+  if(s) rows = W.filter(w=>w.en.toLowerCase().includes(s) || w.zh.includes(vcur.search.trim()) || (w.abbr&&w.abbr.toLowerCase().includes(s)));
+  else rows = W.filter(w=>w.en[0].toUpperCase()===vcur.letter);
+  const html = rows.map(w=>{
+    const st = vstore.s[w.en];
+    const dot = st===2?'var(--ok)':st===1?'var(--amber)':st===0?'var(--bad)':'var(--line)';
+    return `<div class="vlist-row">
+      <span class="e"><i class="sdot" style="background:${dot}"></i>${esc(w.en)}${w.abbr?`<span class="abbr-chip">${esc(w.abbr)}</span>`:''}</span>
+      <span class="z">${esc(w.zh)}</span>
+    </div>`;
+  }).join('');
+  return {count: rows.length, html: html || '<div class="empty">没有匹配的词</div>',
+          label: s? `搜索“${esc(vcur.search)}”` : `${vcur.letter} 开头`};
+}
+function renderVlist(){
+  vClearKey();
+  $('#crumb').textContent = ' / 词表浏览';
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  const chips = letters.map(L=>{
+    const n = W.filter(w=>w.en[0].toUpperCase()===L).length;
+    return n?`<span class="vf ${vcur.letter===L?'on':''}" onclick="vLetter('${L}')">${L}</span>`:'';
+  }).join('');
+  const r = vListRows();
+  $('#app').innerHTML = `
+    <div class="vbar">
+      <button class="btn" onclick="openVocab()">← 返回</button>
+      <span class="qid" id="vcount">${r.label} ${r.count} 词</span>
+    </div>
+    <input class="vsearch" id="vsearch" placeholder="搜索单词 / 中文 / 缩写…" value="${escAttr(vcur.search)}"
+      oninput="vSearch(this.value)">
+    <div id="vchips">${vcur.search.trim()?'':`<div class="vfilters">${chips}</div>`}</div>
+    <div class="qcard" id="vrows" style="padding:6px 4px">${r.html}</div>`;
+}
+function vLetter(L){ vcur.letter = L; vcur.search=''; renderVlist(); }
+function vSearch(v){
+  vcur.search = v;
+  const r = vListRows();
+  const cnt = document.getElementById('vcount');
+  const rows = document.getElementById('vrows');
+  const chips = document.getElementById('vchips');
+  if(cnt) cnt.textContent = `${r.label} ${r.count} 词`;
+  if(rows) rows.innerHTML = r.html;
+  if(chips) chips.innerHTML = vcur.search.trim()?'':vChipsHtml();
+}
+function vChipsHtml(){
+  const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+  return `<div class="vfilters">` + letters.map(L=>{
+    const n = W.filter(w=>w.en[0].toUpperCase()===L).length;
+    return n?`<span class="vf ${vcur.letter===L?'on':''}" onclick="vLetter('${L}')">${L}</span>`:'';
+  }).join('') + `</div>`;
+}
 
 $('#zhToggle').textContent = '中文学员模式：' + (showZh?'开':'关');
 goHome();
