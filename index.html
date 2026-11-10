@@ -421,20 +421,55 @@ let vstore = JSON.parse(localStorage.getItem(VLS) || '{"s":{},"wrong":{},"ab":{}
 if(!vstore.s) vstore.s = {};
 if(!vstore.wrong) vstore.wrong = {};
 if(!vstore.ab) vstore.ab = {};
+if(!vstore.due) vstore.due = {};
+if(!vstore.ivl) vstore.ivl = {};
 const vsave = () => localStorage.setItem(VLS, JSON.stringify(vstore));
+/* 旧版独立缩写词条 → 全称词条 的进度迁移映射 */
+const VDUP = {"ATP":"Arbitrage Trading Program","CD":"Certificate Of Deposit","CFA":"Chartered Financial Analyst","COGS":"Cost of Goods Sold","CPI":"Consumer Price Index","DJIA":"Dow Jones Industrial Average","DJTA":"Dow Jones Transportation Average","DJUA":"Dow Jones Utility Average","EPS":"Earnings Per Share","EVA":"Economic Value Added","FOMC":"Federal Open Market Committee","G-5":"Group of Five","G-7":"Group of Seven","GAAP":"Generally Accepted Accounting Principles","GDP":"Gross Domestic Product","GDR":"Global Depository Receipt","GNP":"Gross National Product","GPM":"Gross Processing Margin","HSI":"Hang Seng Index","IBES":"Institutional Brokers' Estimate System","IPO":"Initial Public Offering","IRR":"Internal Rate of Return","LBO":"Leveraged Buyout","LIBOR":"London Interbank Offer Rate","LIFO":"Last In First Out","LLC":"Limited Liability Company","MTN":"Medium Term Note","NAV":"Net Asset Value","NI":"Net Income","NOI":"Net Operating Income","NPV":"Net Present Value","OPEC":"Organization of Petroleum Exporting Countries","OTC":"Over-The-Counter","REIT":"Real Estate Investment Trust","ROA":"Return On Assets","ROC":"Rate of Change","ROCE":"Return On Capital Employed","ROE":"Return On Equity","ROI":"Return On Investment","ROIC":"Return On Investment Capital","S&P":"Standard And Poor's","SEC":"Securities & Exchange Commission","The Fed":"Federal Reserve System","WACC":"Weighted Average Cost of Capital","WTO":"World Trade Organization"};
+(function vMigrate(){
+  let ch = false;
+  for(const k in VDUP){
+    const t = VDUP[k];
+    if(vstore.s[k]!==undefined){
+      vstore.s[t] = (vstore.s[t]===undefined)? vstore.s[k] : Math.min(vstore.s[t], vstore.s[k]);
+      delete vstore.s[k]; ch = true;
+    }
+    if(vstore.wrong[k]){ vstore.wrong[t]=(vstore.wrong[t]||0)+vstore.wrong[k]; delete vstore.wrong[k]; ch=true; }
+    if(vstore.ab[k]!==undefined){ if(vstore.ab[t]===undefined) vstore.ab[t]=vstore.ab[k]; delete vstore.ab[k]; ch=true; }
+    if(vstore.due[k]!==undefined){ if(vstore.due[t]===undefined) vstore.due[t]=vstore.due[k]; delete vstore.due[k]; ch=true; }
+    if(vstore.ivl[k]!==undefined){ if(vstore.ivl[t]===undefined) vstore.ivl[t]=vstore.ivl[k]; delete vstore.ivl[k]; ch=true; }
+  }
+  if(ch) vsave();
+})();
 const W = (typeof WORDS!=='undefined') ? WORDS.map(a=>({en:a[0], zh:a[1], abbr:a[2]||''})) : [];
 let vcur = {view:'home', filter:'all', letter:'A', search:''};
+const VDAY = 86400000;
 
 function vStats(){
-  let known=0, fuzzy=0, unknown=0;
+  let known=0, fuzzy=0, unknown=0, dueN=0;
+  const now = Date.now();
   for(const k in vstore.s){
     const v = vstore.s[k];
     if(v===2) known++; else if(v===1) fuzzy++; else unknown++;
+    if((vstore.due[k]||0) <= now) dueN++;
   }
   const total = W.length;
-  return {total, known, fuzzy, unknown, unseen: total-known-fuzzy-unknown,
+  return {total, known, fuzzy, unknown, dueN, unseen: total-known-fuzzy-unknown,
           wrongN: Object.keys(vstore.wrong).length,
           abWeak: Object.values(vstore.ab).filter(v=>v===0).length};
+}
+/* 间隔重复调度：认识→间隔翻倍(1,2,4…30天)，模糊→明天，不认识→立刻 */
+function vSchedule(en, v){
+  const now = Date.now();
+  vstore.s[en] = v;
+  if(v===2){
+    const iv = vstore.ivl[en] ? Math.min(vstore.ivl[en]*2, 30) : 1;
+    vstore.ivl[en] = iv; vstore.due[en] = now + iv*VDAY;
+  } else if(v===1){
+    vstore.ivl[en] = 1; vstore.due[en] = now + VDAY;
+  } else {
+    vstore.ivl[en] = 0; vstore.due[en] = now;
+  }
 }
 
 function vPool(filter){
@@ -471,24 +506,32 @@ function renderVocabHome(){
       return n?`<span class="vf ${vcur.filter===L?'on':''}" onclick="vSetFilter('${L}')">${L}</span>`:'';
     }).join('');
   const pool = vPool(vcur.filter);
+  const learnPool = pool.filter(w=>vstore.s[w.en]===undefined);
   $('#app').innerHTML = `
     <div class="home-hero"><h1>📖 金融词汇背单词</h1>
-      <p>看英文回忆中文意思；带缩写的词（如 IPO）加考英文全拼。进度自动保存。</p></div>
+      <p>学新词按顺序推进，旧词按记忆曲线到期自动排队复习（认识→间隔翻倍：1/2/4…30天）。</p></div>
     <div class="vstats">
       <div class="vstat"><b>${st.total}</b><span>总词数</span></div>
       <div class="vstat"><b style="color:var(--ok)">${st.known}</b><span>已掌握</span></div>
       <div class="vstat"><b style="color:var(--amber)">${st.fuzzy}</b><span>模糊</span></div>
       <div class="vstat"><b style="color:var(--bad)">${st.unknown}</b><span>不认识</span></div>
       <div class="vstat"><b>${st.unseen}</b><span>待学</span></div>
-      <div class="vstat"><b style="color:var(--bad)">${st.wrongN}</b><span>默写易错</span></div>
-      <div class="vstat"><b style="color:#c2410c">${st.abWeak}</b><span>缩写待巩固</span></div>
+      <div class="vstat"><b style="color:#7c4ff3">${st.dueN}</b><span>待复习</span></div>
     </div>
-    <div style="margin-top:20px;font-weight:700;font-size:14.5px">选择范围（当前 ${pool.length} 词）</div>
+    <div style="margin-top:20px;font-weight:700;font-size:14.5px">选择范围（当前 ${pool.length} 词 · 待学 ${learnPool.length}）</div>
     <div class="vfilters">${chips}</div>
     <div class="vmodes">
-      <div class="vmode" onclick="startFlash()">
-        <div class="ic">🃏</div><h4>翻卡背词</h4>
-        <p>看英文 → 点卡片翻面看中文 → 自评 认识 / 模糊 / 不认识</p>
+      <div class="vmode" onclick="startFlash('learn')">
+        <div class="ic">🆕</div><h4>学新词 <span style="color:var(--sub);font-size:13px">(${learnPool.length})</span></h4>
+        <p>还没学过的词，按字母顺序推进，接着上次的位置继续</p>
+      </div>
+      <div class="vmode" onclick="startFlash('review')">
+        <div class="ic">🔁</div><h4>复习旧词 <span style="color:#7c4ff3;font-size:13px">(${st.dueN} 到期)</span></h4>
+        <p>按记忆曲线到期的词，认识间隔翻倍，不认识的本轮末尾再过一遍</p>
+      </div>
+      <div class="vmode" onclick="startFlash('free')">
+        <div class="ic">🃏</div><h4>随机翻卡</h4>
+        <p>当前范围内随机翻卡自由练习，不改变复习排期</p>
       </div>
       <div class="vmode" onclick="startType()">
         <div class="ic">✍️</div><h4>默写测验</h4>
@@ -507,27 +550,51 @@ function renderVocabHome(){
 }
 function vSetFilter(f){ vcur.filter = f; renderVocabHome(); }
 function vReset(){
-  if(confirm('确定清空背单词进度（掌握状态、易错记录）？')){
-    vstore = {s:{},wrong:{},ab:{}}; vsave(); renderVocabHome();
+  if(confirm('确定清空背单词进度（掌握状态、复习排期、易错记录）？')){
+    vstore = {s:{},wrong:{},ab:{},due:{},ivl:{}}; vsave(); renderVocabHome();
   }
 }
 
-/* ---- 翻卡模式 ---- */
-function startFlash(){
+/* ---- 翻卡模式（learn 学新词 / review 复习旧词 / free 随机） ---- */
+function startFlash(mode){
+  mode = mode || 'free';
   const pool = vPool(vcur.filter);
-  if(!pool.length){ vEmpty(); return; }
-  const pri = w=>{const s=vstore.s[w.en]; return s===undefined?1:(s===0?0:(s===1?2:3));};
-  const queue = shuffle(pool).sort((a,b)=>pri(a)-pri(b));
-  vcur = {...vcur, view:'flash', queue, idx:0, revealed:false};
+  const now = Date.now();
+  let queue = [];
+  if(mode==='learn'){
+    queue = pool.filter(w=>vstore.s[w.en]===undefined);      // 未学，按字母顺序
+  } else if(mode==='review'){
+    queue = pool.filter(w=>{                                  // 学过且到期，最早到期在前
+      const s = vstore.s[w.en];
+      return s!==undefined && (vstore.due[w.en]||0) <= now;
+    }).sort((a,b)=>(vstore.due[a.en]||0)-(vstore.due[b.en]||0));
+    if(!queue.length){
+      const inCycle = pool.filter(w=>{const s=vstore.s[w.en]; return s!==undefined && (vstore.due[w.en]||0)>now;}).length;
+      $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">😎</p>
+        <p>现在没有到期的词${inCycle?`，${inCycle} 个词还在复习周期中`:'，先去学点新词吧'}</p><br>
+        <button class="btn" onclick="openVocab()">返回单词本</button></div>`;
+      return;
+    }
+  } else {
+    queue = shuffle(pool);                                    // 随机，不排序
+  }
+  if(!queue.length){
+    $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">📭</p>
+      <p>${mode==='learn'?'这个范围的词都学过了':'当前筛选范围内没有单词'}</p><br>
+      <button class="btn" onclick="openVocab()">返回单词本</button></div>`;
+    return;
+  }
+  vcur = {...vcur, view:'flash', mode, queue, idx:0, revealed:false};
   renderFlash();
 }
+const vModeName = {learn:'学新词', review:'复习旧词', free:'随机翻卡'};
 function renderFlash(){
   vClearKey();
   const q = vcur.queue[vcur.idx];
   if(!q){
     $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">🎉</p>
-      <p>这一轮翻完了！</p><br>
-      <button class="btn primary" onclick="startFlash()">再来一轮</button>
+      <p>${vcur.mode==='learn'?'新词学完这一批了！':vcur.mode==='review'?'到期复习全部完成，明天再来！':'这一轮翻完了！'}</p><br>
+      <button class="btn primary" onclick="startFlash('${vcur.mode}')">再来一轮</button>
       <button class="btn" onclick="openVocab()">返回单词本</button></div>`;
     return;
   }
@@ -538,7 +605,7 @@ function renderFlash(){
   $('#app').innerHTML = `
     <div class="vbar">
       <button class="btn" onclick="openVocab()">← 退出</button>
-      <span class="qid"><b>${vcur.idx+1}</b> / ${vcur.queue.length} · ${vFilterName(vcur.filter)}</span>
+      <span class="qid">${vModeName[vcur.mode]} · <b>${vcur.idx+1}</b> / ${vcur.queue.length} · ${vFilterName(vcur.filter)}</span>
     </div>
     <div class="vcard" onclick="vFlip()" id="vcard">
       <div class="vlabel">英 文</div>
@@ -558,22 +625,29 @@ function vFlip(){ vcur.revealed = true; renderFlash(); }
 function vGrade(v){
   const q = vcur.queue[vcur.idx];
   if(!q) return;
-  vstore.s[q.en] = v; vsave();
+  if(vcur.mode==='free'){
+    vstore.s[q.en] = v;                                       // 自由模式只记状态，不动排期
+  } else {
+    vSchedule(q.en, v);                                       // 学新词/复习都走间隔重复调度
+    if(vcur.mode==='review' && v===0 && !q._rq){              // 复习中不认识：本轮末尾再过一遍
+      q._rq = true; vcur.queue.push(q);
+    }
+  }
+  vsave();
   vcur.idx++; vcur.revealed = false;
   renderFlash();
   window.scrollTo({top:0});
 }
-function vEmpty(){
-  $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">📭</p>
-    <p>当前筛选范围内没有单词，换一个范围试试</p><br>
-    <button class="btn primary" onclick="vSetFilterFromEmpty('all')">全部词汇</button></div>`;
-}
-function vSetFilterFromEmpty(f){ vcur.filter=f; renderVocabHome(); }
 
 /* ---- 默写模式 ---- */
 function startType(poolOverride){
   const pool = poolOverride || vPool(vcur.filter);
-  if(!pool.length){ vEmpty(); return; }
+  if(!pool.length){
+    $('#app').innerHTML = `<div class="empty"><p style="font-size:40px">📭</p>
+      <p>当前筛选范围内没有单词</p><br>
+      <button class="btn" onclick="openVocab()">返回单词本</button></div>`;
+    return;
+  }
   let qs = [];
   for(const w of pool){
     qs.push({w, kind:'e2c'});
@@ -656,7 +730,7 @@ function vCheck(){
   vcur.answered = {ok, input};
   if(ok){
     vcur.correct++;
-    if(q.kind==='e2c') vstore.s[q.w.en] = 2;
+    if(q.kind==='e2c') vSchedule(q.w.en, 2);   // 默写对 = 认识，进入复习排期
     else vstore.ab[q.w.en] = 1;
   }
   vsave();
@@ -667,7 +741,7 @@ function vSelf(ok){
   if(!q || !vcur.answered || vcur.answered.ok) return;
   if(ok){
     vcur.correct++;
-    if(q.kind==='e2c') vstore.s[q.w.en] = 2;
+    if(q.kind==='e2c') vSchedule(q.w.en, 2);
     else vstore.ab[q.w.en] = 1;
   } else {
     vMarkWrong(q);
@@ -677,7 +751,7 @@ function vSelf(ok){
   renderType();
 }
 function vMarkWrong(q){
-  if(q.kind==='e2c') vstore.s[q.w.en] = 0;
+  if(q.kind==='e2c') vSchedule(q.w.en, 0);     // 答错 → 立刻到期，进复习队列
   else vstore.ab[q.w.en] = 0;
   vstore.wrong[q.w.en] = (vstore.wrong[q.w.en]||0)+1;
   if(!vcur.wrongWords.some(x=>x.en===q.w.en)) vcur.wrongWords.push(q.w);
